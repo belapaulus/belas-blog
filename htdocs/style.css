@@ -1,0 +1,9 @@
+:root {
+	font-family: sans-serif;
+}
+body {
+	max-width: 512px;
+}
+header {
+	border-bottom: 2px solid black;
+}

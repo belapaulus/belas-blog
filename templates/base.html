@@ -8,10 +8,10 @@
 	</head>
 	<body>
 		<header>
-			<a href="/blog" class="page-title">Béla's Blog</a>
+			<h1><a href="/blog" class="page-title">Béla's Blog</a></h1>
 		</header>
 		<main>
-			{{.Content}}
+{{template "main" .Main}}
 		</main>
 	</body>
 </html>

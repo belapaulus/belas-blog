@@ -2,40 +2,86 @@ package main
 
 import (
 	"github.com/russross/blackfriday/v2"
-	"log"
 	"os"
+	"encoding/csv"
+	"strings"
+	"io"
+	"log"
+	"fmt"
 	"text/template"
 )
 
-const (
-	articleDir  = "articles"
-	templateDir = "templates"
-	outDir      = "htdocs"
-)
-
-func main() {
-	genArticlePage("test")
+type article struct {
+	Title, Date, MDFile, HTMLFile string
 }
 
-func genArticlePage(articleFileName string) {
+
+func main() {
+	file, err := os.Open("articles.csv")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	r := csv.NewReader(file)
+	var articleList []article
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(record)
+		title := record[0]
+		date := record[1]
+		mdFile := record[2]
+		htmlFile := date + "-" + strings.Split(mdFile, ".")[0] + ".html"
+		a := article{title, date, mdFile, htmlFile}
+		articleList = append(articleList, a)
+		makePage(mdFile, htmlFile)
+	}
+	makeList(articleList)
+}
+
+func makePage(mdFile, htmlFile string) {
 	// load template
-	tmpl, err := template.ParseFiles(templateDir + "/base.html")
+	tmpl, err := template.ParseFiles("templates/base.html", "templates/page.html")
 	if err != nil {
 		log.Fatal(err)
 	}
 	// load article
-	article, err := os.ReadFile(articleDir + "/" + articleFileName + ".md")
+	article, err := os.ReadFile("articles/" + mdFile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	data := struct{ Content string }{string(blackfriday.Run(article))}
-	// create output file
-	f, err := os.OpenFile(outDir+"/"+articleFileName+".html", os.O_WRONLY|os.O_CREATE, 0644)
+	// execute template
+	file, err := os.OpenFile("htdocs/" + htmlFile, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
-	err = tmpl.Execute(f, data)
+	defer file.Close()
+	data := struct{ Main string }{ string(blackfriday.Run(article)) }
+	err = tmpl.Execute(file, data)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func makeList(articleList []article) {
+	// load template
+	tmpl, err := template.ParseFiles("templates/base.html", "templates/list.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+	// execute template
+	file, err := os.OpenFile("htdocs/index.html", os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	data := struct{ Main []article }{ articleList }
+	err = tmpl.Execute(file, data)
 	if err != nil {
 		log.Fatal(err)
 	}
