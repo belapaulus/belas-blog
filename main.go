@@ -6,11 +6,13 @@ import (
 	"encoding/csv"
 	"strings"
 	"io"
+	"time"
 	"text/template"
 )
 
 type article struct {
-	Title, Date, MDFile, HTMLFile string
+	Title, MDFile, HTMLFile string
+	Date time.Time
 }
 
 func main() {
@@ -36,10 +38,18 @@ func getArticles() (articleSlice []article) {
 			panic(err)
 		}
 		title := record[0]
-		date := record[1]
+		date, err := time.Parse("2006-01-02", record[1])
+		if err != nil {
+			panic(err)
+		}
 		mdFile := record[2]
-		htmlFile := date + "-" + strings.Split(mdFile, ".")[0] + ".html"
-		a := article{title, date, mdFile, htmlFile}
+		htmlFile := date.Format("2006-01-02") + "-" + strings.Split(mdFile, ".")[0] + ".html"
+		a := article{
+			Title: title,
+			Date: date,
+			MDFile: mdFile,
+			HTMLFile: htmlFile,
+		}
 		articleSlice = append(articleSlice, a)
 	}
 	return
@@ -57,7 +67,7 @@ func makePages(articleSlice []article, webring string) {
 			// TODO: replace log.fatal with panic
 			panic(err)
 		}
-		file, err := os.OpenFile("htdocs/" + article.HTMLFile, os.O_RDWR|os.O_CREATE, 0644)
+		file, err := os.OpenFile("htdocs/" + article.HTMLFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 		if err != nil {
 			panic(err)
 		}
@@ -78,12 +88,17 @@ func makePages(articleSlice []article, webring string) {
 
 func makeList(articleSlice []article, webring string) {
 	// load template
-	tmpl, err := template.ParseFiles("templates/base.html", "templates/list.html", "templates/footer.html")
+	tmpl, err := template.New("template").Funcs(template.FuncMap{
+			"datef": func(fmt string, t time.Time) string {
+				return t.Format(fmt)
+			},
+		}).
+		ParseFiles("templates/base.html", "templates/list.html", "templates/footer.html")
 	if err != nil {
 		panic(err)
 	}
 	// execute template
-	file, err := os.OpenFile("htdocs/index.html", os.O_RDWR|os.O_CREATE, 0644)
+	file, err := os.OpenFile("htdocs/index.html", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		panic(err)
 	}
@@ -95,7 +110,7 @@ func makeList(articleSlice []article, webring string) {
 		Main: articleSlice,
 		Footer: webring,
 	}
-	err = tmpl.Execute(file, data)
+	err = tmpl.ExecuteTemplate(file, "base.html", data)
 	if err != nil {
 		panic(err)
 	}

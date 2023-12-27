@@ -10,3 +10,7 @@ header {
 footer {
 	border-top: 2px solid black;
 }
+ul {
+	list-style: none;
+	padding-left: 0;
+}
