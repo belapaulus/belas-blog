@@ -6,8 +6,6 @@ import (
 	"encoding/csv"
 	"strings"
 	"io"
-	"log"
-	"fmt"
 	"text/template"
 )
 
@@ -15,74 +13,90 @@ type article struct {
 	Title, Date, MDFile, HTMLFile string
 }
 
-
 func main() {
+	articleSlice := getArticles()
+	webring := openring()
+	makePages(articleSlice, webring)
+	makeList(articleSlice, webring)
+}
+
+func getArticles() (articleSlice []article) {
 	file, err := os.Open("articles.csv")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	defer file.Close()
 	r := csv.NewReader(file)
-	var articleList []article
 	for {
 		record, err := r.Read()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
-		fmt.Println(record)
 		title := record[0]
 		date := record[1]
 		mdFile := record[2]
 		htmlFile := date + "-" + strings.Split(mdFile, ".")[0] + ".html"
 		a := article{title, date, mdFile, htmlFile}
-		articleList = append(articleList, a)
-		makePage(mdFile, htmlFile)
+		articleSlice = append(articleSlice, a)
 	}
-	makeList(articleList)
+	return
 }
 
-func makePage(mdFile, htmlFile string) {
-	// load template
-	tmpl, err := template.ParseFiles("templates/base.html", "templates/page.html")
+func makePages(articleSlice []article, webring string) {
+	tmpl, err := template.ParseFiles("templates/base.html", "templates/page.html", "templates/footer.html")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
-	// load article
-	article, err := os.ReadFile("articles/" + mdFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// execute template
-	file, err := os.OpenFile("htdocs/" + htmlFile, os.O_RDWR|os.O_CREATE, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-	data := struct{ Main string }{ string(blackfriday.Run(article)) }
-	err = tmpl.Execute(file, data)
-	if err != nil {
-		log.Fatal(err)
+	for _, article := range articleSlice {
+		// TODO: use path.join()
+		content, err := os.ReadFile("articles/" + article.MDFile)
+		if err != nil {
+			// TODO: replace log.fatal with panic
+			panic(err)
+		}
+		file, err := os.OpenFile("htdocs/" + article.HTMLFile, os.O_RDWR|os.O_CREATE, 0644)
+		if err != nil {
+			panic(err)
+		}
+		data := struct{ 
+			Main string
+			Footer string
+		}{ 
+			Main: string(blackfriday.Run(content)),
+			Footer: webring,
+		}
+		err = tmpl.Execute(file, data)
+		if err != nil {
+			panic(err)
+		}
+		file.Close()
 	}
 }
 
-func makeList(articleList []article) {
+func makeList(articleSlice []article, webring string) {
 	// load template
-	tmpl, err := template.ParseFiles("templates/base.html", "templates/list.html")
+	tmpl, err := template.ParseFiles("templates/base.html", "templates/list.html", "templates/footer.html")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	// execute template
 	file, err := os.OpenFile("htdocs/index.html", os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	defer file.Close()
-	data := struct{ Main []article }{ articleList }
+	data := struct{
+		Main []article
+		Footer string
+	}{ 
+		Main: articleSlice,
+		Footer: webring,
+	}
 	err = tmpl.Execute(file, data)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
