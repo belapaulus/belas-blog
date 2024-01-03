@@ -56,7 +56,7 @@ func getArticles() (articleSlice []article) {
 }
 
 func makePages(articleSlice []article, webring string) {
-	tmpl, err := template.ParseFiles("templates/base.html", "templates/page.html", "templates/footer.html")
+	tmpl, err := template.ParseFiles("templates/base.html", "templates/page.html")
 	if err != nil {
 		panic(err)
 	}
@@ -72,9 +72,13 @@ func makePages(articleSlice []article, webring string) {
 			panic(err)
 		}
 		data := struct{ 
+			Stylesheets []string
+			Title string
 			Main string
 			Footer string
 		}{ 
+			Stylesheets: []string{"style.css", "page.css"},
+			Title: article.Title,
 			Main: string(blackfriday.Run(content)),
 			Footer: webring,
 		}
@@ -93,7 +97,7 @@ func makeList(articleSlice []article, webring string) {
 				return t.Format(fmt)
 			},
 		}).
-		ParseFiles("templates/base.html", "templates/list.html", "templates/footer.html")
+		ParseFiles("templates/base.html", "templates/list.html")
 	if err != nil {
 		panic(err)
 	}
@@ -106,7 +110,9 @@ func makeList(articleSlice []article, webring string) {
 	data := struct{
 		Main []article
 		Footer string
+		Stylesheets []string
 	}{ 
+		Stylesheets: []string{"style.css"},
 		Main: articleSlice,
 		Footer: webring,
 	}

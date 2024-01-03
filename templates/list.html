@@ -1,14 +1,13 @@
-{{define "main"}}
-	<p>
-I enjoy reading, DIY websites have a special place in my heart and
-I have learned a lot from my favorite blogs on the web. Since I also
-enjoy writing I have always wanted to start a blog. So this is my own
-little blog. Have fun reading.
-	</p>
-	<h2>Articles</h2>
+{{define "page"}}
+<header>
+	<h1>Béla's Blog</h1>
+</header>
+<main>
+	<p>Welcome to my blog! Have fun :O)</p>
 	<ul>
-	{{range .}}
+	{{range .Main}}
 		<li>{{.Date | datef "January 2, 2006"}} <a href="{{.HTMLFile}}">{{.Title}}</a></li>
 	{{end}}
 	</ul>
+</main>
 {{end}}
