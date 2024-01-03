@@ -3,8 +3,15 @@
 	<h1>Béla's Blog</h1>
 </header>
 <main>
-	<p>Welcome to my blog! Have fun :O)</p>
-	<ul>
+	<p>
+	Hi, I'm Béla and this is my blog. I think I'll mostly write about
+	computer sience related topics, about things that I'm interested
+	in or things that I'm currently learning about. Maybe there will be 
+	some articles about music or politics or something completely
+	different. We'll see. I hope you have a lot of fun reading. Here
+	is a list of my articles:
+	</p>
+	<ul class="article-list">
 	{{range .Main}}
 		<li>{{.Date | datef "January 2, 2006"}} <a href="{{.HTMLFile}}">{{.Title}}</a></li>
 	{{end}}
