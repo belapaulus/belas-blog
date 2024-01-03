@@ -17,9 +17,8 @@ type article struct {
 
 func main() {
 	articleSlice := getArticles()
-	webring := openring()
-	makePages(articleSlice, webring)
-	makeList(articleSlice, webring)
+	makePages(articleSlice)
+	makeList(articleSlice)
 }
 
 func getArticles() (articleSlice []article) {
@@ -55,7 +54,7 @@ func getArticles() (articleSlice []article) {
 	return
 }
 
-func makePages(articleSlice []article, webring string) {
+func makePages(articleSlice []article) {
 	tmpl, err := template.ParseFiles("templates/base.html", "templates/page.html")
 	if err != nil {
 		panic(err)
@@ -75,12 +74,10 @@ func makePages(articleSlice []article, webring string) {
 			Stylesheets []string
 			Title string
 			Main string
-			Footer string
 		}{ 
 			Stylesheets: []string{"style.css", "page.css"},
 			Title: article.Title,
 			Main: string(blackfriday.Run(content)),
-			Footer: webring,
 		}
 		err = tmpl.Execute(file, data)
 		if err != nil {
@@ -90,7 +87,7 @@ func makePages(articleSlice []article, webring string) {
 	}
 }
 
-func makeList(articleSlice []article, webring string) {
+func makeList(articleSlice []article) {
 	// load template
 	tmpl, err := template.New("template").Funcs(template.FuncMap{
 			"datef": func(fmt string, t time.Time) string {
@@ -109,12 +106,10 @@ func makeList(articleSlice []article, webring string) {
 	defer file.Close()
 	data := struct{
 		Main []article
-		Footer string
 		Stylesheets []string
 	}{ 
 		Stylesheets: []string{"style.css"},
 		Main: articleSlice,
-		Footer: webring,
 	}
 	err = tmpl.ExecuteTemplate(file, "base.html", data)
 	if err != nil {
