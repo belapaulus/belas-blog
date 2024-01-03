@@ -1,7 +1,7 @@
 :root {
 	font-family: sans-serif;
 }
-body {
+html, body {
 	margin: 0;
 	padding: 0;
 	width: 100%;
@@ -9,12 +9,9 @@ body {
 }
 .content {
 	max-width: 512px;
-	margin: 0 auto;
+	padding: 1rem;
 }
-footer {
-	border-top: 2px solid black;
-}
-ul {
+.article-list {
 	list-style: none;
 	padding-left: 0;
 }
