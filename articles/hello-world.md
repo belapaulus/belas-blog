@@ -1,20 +1,25 @@
-After several attempts at starting a blog, this is it, my own blog and
-my first blog post :O). I enjoy reading, DIY websites have a
-special place in my heart and I have learned a lot from my favorite
-blogs on the web and since I also enjoy writing I have wanted to start
-a blog for some time now.
+After several attempts at starting a blog, this is it! Welcome to my
+blog and my very first blog post!
 
-I don't really know yet what I will write about. I always learn a lot
-from writing about topics that interest me. Probably a lot of technical
-stuff. But maybe I will also write about music or art or politics. I
-really don't know yet.
+There are so many interesting blogs on the web. I love small self-made
+personal websites. I'm always happy when I stumble upon a new one. So I
+have wanted to create my own self-made website for other people to
+stumble upon for some time now. 
 
-But I do know that I will always try to link to a lot of interesting,
-self made websites. Here is the first one:
+I don't really know what I will write about yet. I like writing about
+the things that I'm currently interested in. Writing always improves
+my understanding of a topic. So I'll probably write about a lot of
+technical computer science related stuff. Stuff I am working on or my 
+new favorite free and open source software. But maybe I'll also write
+about art or politics. I really don't know yet.
+
+But I do know that I will always try to link to interesting little
+websites for further reading. Like this one: 
 [The Small Website Discoverability Crisis](https://www.marginalia.nu/log/19-website-discoverability-crisis/).
-You should go ahead and read it. It's the reason why I will always try
-to link to a lot of interesting little websites. You can also find a
-list of my favorite pages here: [Béla's Bookmarks](/bookmarks.html).
+I like the Idea of publishing your favorite bookmarks. Here is my list
+of favorite bookmarks:
+[Béla's Bookmarks](/bookmarks.html).
+I'll add to it in the future.
 
 Anyway, this is it for today. I hope to see you again here on my little
 blog. Enjoy your day :O).
