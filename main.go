@@ -11,9 +11,11 @@ import (
 )
 
 type article struct {
-	Title, MDFile, HTMLFile string
+	Title, MDFile, HTMLFile, MDContent, HTMLContent string
 	Date time.Time
 }
+
+// TODO: use path.join() where applicable
 
 func main() {
 	articleSlice := getArticles()
@@ -43,11 +45,18 @@ func getArticles() (articleSlice []article) {
 		}
 		mdFile := record[2]
 		htmlFile := date.Format("2006-01-02") + "-" + strings.Split(mdFile, ".")[0] + ".html"
+		mdContent, err := os.ReadFile("articles/" + mdFile)
+		if err != nil {
+			panic(err)
+		}
+		htmlContent := blackfriday.Run(mdContent)
 		a := article{
 			Title: title,
 			Date: date,
 			MDFile: mdFile,
 			HTMLFile: htmlFile,
+			MDContent: string(mdContent),
+			HTMLContent: string(htmlContent),
 		}
 		articleSlice = append(articleSlice, a)
 	}
@@ -55,31 +64,28 @@ func getArticles() (articleSlice []article) {
 }
 
 func makePages(articleSlice []article) {
-	tmpl, err := template.ParseFiles("templates/base.html", "templates/page.html")
+	tmpl, err := template.New("template").Funcs(template.FuncMap{
+			"datef": func(fmt string, t time.Time) string {
+				return t.Format(fmt)
+			},
+		}).
+		ParseFiles("templates/base.html", "templates/page.html")
 	if err != nil {
 		panic(err)
 	}
-	for _, article := range articleSlice {
-		// TODO: use path.join()
-		content, err := os.ReadFile("articles/" + article.MDFile)
-		if err != nil {
-			// TODO: replace log.fatal with panic
-			panic(err)
-		}
-		file, err := os.OpenFile("htdocs/" + article.HTMLFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	for _, a := range articleSlice {
+		file, err := os.OpenFile("htdocs/" + a.HTMLFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 		if err != nil {
 			panic(err)
 		}
 		data := struct{ 
 			Stylesheets []string
-			Title string
-			Main string
+			Main article
 		}{ 
 			Stylesheets: []string{"style.css", "page.css"},
-			Title: article.Title,
-			Main: string(blackfriday.Run(content)),
+			Main: a,
 		}
-		err = tmpl.Execute(file, data)
+		err = tmpl.ExecuteTemplate(file, "base.html", data)
 		if err != nil {
 			panic(err)
 		}
