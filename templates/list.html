@@ -10,7 +10,7 @@
 	</p>
 	<ul class="article-list">
 	{{range .Main}}
-		<li>{{.Date | datef "January 2, 2006"}} <a href="{{.HTMLFile}}">{{.Title}}</a></li>
+		<li> <span>{{.Date | datef "January 2, 2006"}}</span> <a href="{{.HTMLFile}}">{{.Title}}</a></li>
 	{{end}}
 	</ul>
 </main>

@@ -15,6 +15,10 @@ html, body {
 	list-style: none;
 	padding-left: 0;
 }
+.article-list span {
+	display: inline-block;
+	width: 10rem;
+}
 .article-title {
 	margin-bottom: 0;
 }

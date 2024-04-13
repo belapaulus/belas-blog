@@ -6,6 +6,7 @@ import (
 	"encoding/csv"
 	"strings"
 	"io"
+	"sort"
 	"time"
 	"text/template"
 )
@@ -22,6 +23,12 @@ func main() {
 	makePages(articleSlice)
 	makeList(articleSlice)
 }
+
+type byDate []article
+
+func (a byDate) Len() int		{ return len(a) }
+func (a byDate) Swap(i, j int) 		{ a[i], a[j] = a[j], a[i] }
+func (a byDate) Less(i, j int) bool 	{ return a[j].Date.Before(a[i].Date) }
 
 func getArticles() (articleSlice []article) {
 	file, err := os.Open("articles.csv")
@@ -60,6 +67,7 @@ func getArticles() (articleSlice []article) {
 		}
 		articleSlice = append(articleSlice, a)
 	}
+	sort.Sort(byDate(articleSlice))
 	return
 }
 
